@@ -83,12 +83,14 @@
     <ClCompile Include="src\ccr.c" />
     <ClCompile Include="src\ir.c" />
     <ClCompile Include="src\memory.c" />
+    <ClCompile Include="src\opcodes.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ccr.h" />
     <ClInclude Include="include\config.h" />
     <ClInclude Include="include\ir.h" />
     <ClInclude Include="include\memory.h" />
+    <ClInclude Include="include\opcodes.h" />
     <ClInclude Include="include\uc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

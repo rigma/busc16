@@ -8,10 +8,17 @@ ccr_t ccr_init()
 	return (ccr_t) 0x00;
 }
 
+ccr_t ccr_reset(ccr_t *ccr)
+{
+	*ccr = (ccr_t) 0x00;
+
+	return *ccr;
+}
+
 u8 ccr_Z(ccr_t *ccr)
 {
 	// return 0000 xxxx & 0000 1000
-	return (ccr != NULL) ? (u8) (*ccr & 0x08) : FALSE;
+	return (ccr != NULL) ? (u8) (*ccr & 0x08) >> 3 : FALSE;
 }
 
 void ccr_changeValueZ(ccr_t *ccr, u8 value)
@@ -26,7 +33,7 @@ void ccr_changeValueZ(ccr_t *ccr, u8 value)
 u8 ccr_N(ccr_t *ccr)
 {
 	// return 0000 xxxx & 0000 0100
-	return (ccr != NULL) ? (u8) (*ccr & 0x04) : FALSE;
+	return (ccr != NULL) ? (u8) (*ccr & 0x04) >> 2 : FALSE;
 }
 
 void ccr_changeValueN(ccr_t *ccr, u8 value)
@@ -41,7 +48,7 @@ void ccr_changeValueN(ccr_t *ccr, u8 value)
 u8 ccr_C(ccr_t *ccr)
 {
 	// return 0000 xxxx & 0000 0010
-	return (ccr != NULL) ? (u8) (*ccr & 0x02) : FALSE;
+	return (ccr != NULL) ? (u8) (*ccr & 0x02) >> 1 : FALSE;
 }
 
 void ccr_changeValueC(ccr_t *ccr, u8 value)

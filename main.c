@@ -16,13 +16,38 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <ccr.h>
+#include <opcodes.h>
+
 int main(int argc, char **argv)
 {
 	// Some bullshit tests :P
-	int var = 0;
+	ccr_t ccr = ccr_init();
+	u8 d0 = 15;
 
-	printf("Hello world !");
-	fscanf(stdin, "%d", &var);
+	printf("Initial value d0 = %u\n", d0);
+	printf("Z = %u | N = %u | C = %u | V = %u\n\n", ccr_Z(&ccr), ccr_N(&ccr), ccr_C(&ccr), ccr_V(&ccr));
+
+	ccr_reset(&ccr);
+	opcodes[8](&d0, 8, &ccr);
+
+	printf("d0 = %u\n", d0);
+	printf("Z = %u | N = %u | C = %u | V = %u\n\n", ccr_Z(&ccr), ccr_N(&ccr), ccr_C(&ccr), ccr_V(&ccr));
+
+	ccr_reset(&ccr);
+	opcodes[9](&d0, 24, &ccr);
+
+	printf("d0 = %u\n", d0);
+	printf("Z = %u | N = %u | C = %u | V = %u\n\n", ccr_Z(&ccr), ccr_N(&ccr), ccr_C(&ccr), ccr_V(&ccr));
+
+	ccr_reset(&ccr);
+	opcodes[8](&d0, 24, &ccr);
+	opcodes[10](&d0, 24, &ccr);
+
+	printf("d0 = %u\n", d0);
+	printf("Z = %u | N = %u | C = %u | V = %u\n\n", ccr_Z(&ccr), ccr_N(&ccr), ccr_C(&ccr), ccr_V(&ccr));
+
+	system("pause");
 
 	return EXIT_SUCCESS;
 }

@@ -18,6 +18,16 @@
 
 #include "config.h"
 
+#define ccr_setZ(ccr) ccr_changeValueZ(ccr, TRUE)
+#define ccr_setN(ccr) ccr_changeValueN(ccr, TRUE)
+#define ccr_setC(ccr) ccr_changeValueC(ccr, TRUE)
+#define ccr_setV(ccr) ccr_changeValueV(ccr, TRUE)
+
+#define ccr_resetZ(ccr) ccr_changeValueZ(ccr, FALSE)
+#define ccr_resetN(ccr) ccr_changeValueN(ccr, FALSE)
+#define ccr_resetC(ccr) ccr_changeValueC(ccr, FALSE)
+#define ccr_resetV(ccr) ccr_changeValueV(ccr, FALSE)
+
 typedef unsigned char ccr_t;
 
 /**
@@ -27,6 +37,15 @@ typedef unsigned char ccr_t;
  * @return ccr_t : the initial value
  */
 ccr_t ccr_init();
+
+/**
+ * @fn     ccr_reset(ccr_t *ccr)
+ * @author Romain Failla
+ * @brief  Reset a CCR register
+ * @param  ccr_t *ccr : the reference of the register
+ * @return ccr_t : the reset value
+ */
+ccr_t ccr_reset(ccr_t *ccr);
 
 /**
  * @fn     ccr_Z(ccr_t *ccr)
@@ -95,15 +114,5 @@ u8 ccr_V(ccr_t *ccr);
 * @param  ccr_t *ccr : the reference of CCR register
 */
 void ccr_changeValueV(ccr_t *ccr, u8 value);
-
-#define ccr_setZ(ccr) ccr_changeValueZ(ccr, TRUE)
-#define ccr_setN(ccr) ccr_changeValueN(ccr, TRUE)
-#define ccr_setC(ccr) ccr_changeValueC(ccr, TRUE)
-#define ccr_setV(ccr) ccr_changeValueV(ccr, TRUE)
-
-#define ccr_resetZ(ccr) ccr_changeValueZ(ccr, FALSE)
-#define ccr_resetZ(ccr) ccr_changeValueN(ccr, FALSE)
-#define ccr_resetC(ccr) ccr_changeValueC(ccr, FALSE)
-#define ccr_resetV(ccr) ccr_changeValueV(ccr, FALSE)
 
 #endif
