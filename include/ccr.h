@@ -13,17 +13,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef CCR_H
+#define CCR_H
 
-#define MEMORY_SIZE 0x100
+#include "config.h"
 
-#define TRUE  (u8) 0x1
-#define FALSE (u8) 0x0
+typedef unsigned char ccr_t;
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef unsigned long u64;
+ccr_t ccr_init();
+
+u8 ccr_Z(ccr_t *ccr);
+void ccr_setZ(ccr_t *ccr, u8 value);
+
+u8 ccr_N(ccr_t *ccr);
+void ccr_setN(ccr_t *ccr, u8 value);
+
+u8 ccr_C(ccr_t *ccr);
+void ccr_setC(ccr_t *ccr, u8 value);
+
+u8 ccr_V(ccr_t *ccr);
+void ccr_setV(ccr_t *ccr, u8 value);
 
 #endif
