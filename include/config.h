@@ -16,10 +16,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define MEMORY_SIZE 0x100
+#define MEMORY_SIZE 0x100 // the size of memory (may changes)
 
-#define TRUE  (u8) 0x1
-#define FALSE (u8) 0x0
+#define TRUE  (u8) 0x1    // the value of truth
+#define FALSE (u8) 0x0    // the value of lie
 
 typedef unsigned char u8;
 typedef unsigned short u16;

@@ -18,6 +18,7 @@
 
 int main(int argc, char **argv)
 {
+	// Some bullshit tests :P
 	int var = 0;
 
 	printf("Hello world !");

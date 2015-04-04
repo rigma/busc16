@@ -25,25 +25,31 @@ memory_t *memory_init(const char *filename)
 	memory_t *m = NULL;
 	short i = 0;
 	
+	// Trying to allocating the memory
 	m = (memory_t*) malloc(sizeof(memory_t));
 	if (m == NULL)
 		return NULL;
 
+	// If the filename is here
 	if (filename != NULL)
 	{
+		// Trying to open the file in binary reading mode
 		f = fopen(filename, "rb");
 		if (f != NULL)
 		{
+			// Reading the file content
 			fread((void*) m->ram, sizeof(u8), MEMORY_SIZE, f);
 			fclose(f);
 		}
 	}
 	else
 	{
+		// Otherwise, we just reset the whole program part
 		for (i = 0; i <= (u16) (MEMORY_SIZE / 2); i++)
-			m->ram[i] = (u16) 0;
+			m->ram[i] = (u8) 0;
 	}
 
+	// Copying the filename
 	m->filename = (char*) malloc(sizeof(filename) * sizeof(char));
 	if (m->filename == NULL)
 	{
@@ -54,6 +60,7 @@ memory_t *memory_init(const char *filename)
 
 	strcpy(m->filename, filename);
 
+	// Setting MAR and MBR to the 0 position
 	m->mar = (u8*) m->ram;
 	m->mbr = (u8*) (m->ram + MEMORY_SIZE - 1);
 
@@ -64,27 +71,32 @@ void memory_free(memory_t *m)
 {
 	FILE *f = NULL;
 
+	// Trying to open the file of save
 	f = fopen(m->filename, "wb");
 	if (f != NULL)
 	{
+		// Writing the content of the memory on the file
 		fwrite((void*) m->ram, sizeof(u8), MEMORY_SIZE, f);
 		fclose(f);
 	}
 
+	// FREE THEM ALL !!!!
 	free(m->filename);
 	free(m);
 }
 
+u8 *memory_setMarPos(memory_t *m, u16 address)
+{
+	// If the positionning address is greater or equal to MEMORY_SIZE / 2, then we set position else, we do nothing
+	m->mar = (address <= MEMORY_SIZE >> 1) ? (u8*)m->ram + address : m->mar;
+
+	return m->mar;
+}
+
 u8 *memory_setMbrPos(memory_t *m, u16 address)
 {
+	// If the positionning address is lesser than MEMORY_SIZE / 2, then we set position else, we do nothing
 	m->mbr = (address < MEMORY_SIZE >> 1) ? (u8*) (m->ram + MEMORY_SIZE - address - 1) : m->mbr;
 
 	return m->mbr;
-}
-
-u8 *memory_setMarPos(memory_t *m, u16 address)
-{
-	m->mar = (address <= MEMORY_SIZE >> 1) ? (u8*) m->ram + address : m->mar;
-
-	return m->mar;
 }
