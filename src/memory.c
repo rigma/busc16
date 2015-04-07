@@ -50,15 +50,20 @@ memory_t *memory_init(const char *filename)
 	}
 
 	// Copying the filename
-	m->filename = (char*) malloc(sizeof(filename) * sizeof(char));
-	if (m->filename == NULL)
+	if (filename != NULL)
 	{
-		free(m);
+		m->filename = (char*)malloc(sizeof(filename) * sizeof(char));
+		if (m->filename == NULL)
+		{
+			free(m);
 
-		return NULL;
+			return NULL;
+		}
+
+		strcpy(m->filename, filename);
 	}
-
-	strcpy(m->filename, filename);
+	else
+		m->filename = NULL;
 
 	// Setting MAR and MBR to the 0 position
 	m->mar = (u8*) m->ram;
@@ -72,12 +77,15 @@ void memory_free(memory_t *m)
 	FILE *f = NULL;
 
 	// Trying to open the file of save
-	f = fopen(m->filename, "wb");
-	if (f != NULL)
+	if (m->filename != NULL)
 	{
-		// Writing the content of the memory on the file
-		fwrite((void*) m->ram, sizeof(u8), MEMORY_SIZE, f);
-		fclose(f);
+		f = fopen(m->filename, "wb");
+		if (f != NULL)
+		{
+			// Writing the content of the memory on the file
+			fwrite((void*) m->ram, sizeof(u8), MEMORY_SIZE, f);
+			fclose(f);
+		}
 	}
 
 	// FREE THEM ALL !!!!
