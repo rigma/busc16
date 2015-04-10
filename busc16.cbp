@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="busc16" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="bin/busc16" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="./include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="include/ccr.h" />
+		<Unit filename="include/config.h" />
+		<Unit filename="include/cu.h" />
+		<Unit filename="include/ir.h" />
+		<Unit filename="include/memory.h" />
+		<Unit filename="include/opcodes.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ccr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/cu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ir.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/memory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/opcodes.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
