@@ -16,16 +16,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <ccr.h>
-#include <ir.h>
-#include <opcodes.h>
-
-#include "include/memory.h"
+#include <cu.h>
 
 int main(int argc, char **argv)
 {
 	// Some bullshit tests :P
-	ir_t *ir = ir_init();
+	/*ir_t *ir = ir_init();
 	memory_t *m = memory_init(NULL);
 	ccr_t ccr = ccr_init();
 	u8 d0 = 15;
@@ -69,7 +65,17 @@ int main(int argc, char **argv)
 	system("pause");
 
 	memory_free(m);
-	ir_free(ir);
+	ir_free(ir);*/
+
+	cu_t *cu = cu_init("test.ram");
+
+	if (cu == NULL)
+		exit(EXIT_FAILURE);
+
+	cu_run(cu);
+	cu_free(cu);
+
+	system("pause");
 
 	return EXIT_SUCCESS;
 }

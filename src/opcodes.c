@@ -18,7 +18,7 @@
 
 static u8 stop(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
-	*pc = MEMORY_SIZE + 1;
+	*pc = MEMORY_SIZE;
 
 	return TRUE;
 }
@@ -73,7 +73,7 @@ static u8 lda(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 		*d0 = *m->mbr;
 	}
 
-	*pc++;
+	*pc += 3;
 
 	return TRUE;
 }
@@ -86,7 +86,7 @@ static u8 sda(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 		return FALSE;
 
 	*m->mbr = *d0;
-	*pc++;
+	*pc += 3;
 
 	return TRUE;
 }
@@ -113,7 +113,7 @@ static u8 add(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	if (tmp > 0xff)
 		ccr_setC(ccr);
 
-	*pc++;
+	*pc += 3;
 
 	return TRUE;
 }
@@ -143,7 +143,7 @@ static u8 sub(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	else if (tmp < 0x0)
 		ccr_setN(ccr);
 
-	*pc++;
+	*pc += 3;
 
 	return TRUE;
 }
@@ -170,7 +170,7 @@ static u8 mul(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	if (tmp > 0xff)
 		ccr_setV(ccr);
 
-	*pc++;
+	*pc += 3;
 
 	return TRUE;
 }
@@ -197,7 +197,7 @@ static u8 div(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	if (tmp > 0xff)
 		ccr_setV(ccr);
 
-	*pc++;
+	*pc += 3;
 
 	return TRUE;
 }
@@ -225,7 +225,7 @@ static u8 cmp(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	else if (tmp < 0x0)
 		ccr_setN(ccr);
 
-	*pc++;
+	*pc += 3;
 
 	return TRUE;
 }
@@ -245,7 +245,7 @@ static u8 dsp(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 		printf("%u\n", *m->mbr);
 	}
 
-	*pc++;
+	*pc += 3;
 
 	return TRUE;
 }

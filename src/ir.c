@@ -14,6 +14,7 @@
 */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <ir.h>
@@ -50,7 +51,7 @@ u8 ir_loadInstruction(ir_t *ir, u16 pc, memory_t *m)
 
 	// Moving MAR position
 	mar = m->mar;
-	if (mar == memory_setMarPos(m, pc))
+	if (!memory_setMarPos(m, pc))
 		return FALSE;
 
 	// Copying the new instruction

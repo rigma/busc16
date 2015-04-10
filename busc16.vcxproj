@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
     <ClCompile Include="src\ccr.c" />
+    <ClCompile Include="src\cu.c" />
     <ClCompile Include="src\ir.c" />
     <ClCompile Include="src\memory.c" />
     <ClCompile Include="src\opcodes.c" />
@@ -91,7 +92,7 @@
     <ClInclude Include="include\ir.h" />
     <ClInclude Include="include\memory.h" />
     <ClInclude Include="include\opcodes.h" />
-    <ClInclude Include="include\uc.h" />
+    <ClInclude Include="include\cu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
