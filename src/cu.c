@@ -1,17 +1,17 @@
 /**
-* BUSC16 - An emulator of a theorical processor for lessons
-* Copyright (C) 2015 Romain Failla
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * BUSC16 - An emulator of a theorical processor for lessons
+ * Copyright (C) 2015 Romain Failla
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -37,6 +37,9 @@ cu_t *cu_init(const char *filename)
 
 void cu_free(cu_t *cu)
 {
+	if (cu == NULL)
+		return;
+
 	ir_free(cu->ir);
 	memory_free(cu->ram);
 
@@ -46,6 +49,9 @@ void cu_free(cu_t *cu)
 u8 cu_run(cu_t *cu)
 {
 	u8 stop = FALSE;
+
+	if (cu == NULL)
+		return FALSE;
 
 	while (cu->pc < MEMORY_SIZE && !stop)
 	{

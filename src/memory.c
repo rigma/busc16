@@ -38,26 +38,26 @@ memory_t *memory_init(const char *filename)
 		if (f != NULL)
 		{
 			// Reading the file content
-			fread((void*) m->ram, sizeof(u8), MEMORY_SIZE / 2, f);
+			fread((void*) m->ram, sizeof(u8), MEMORY_SIZE >> 1, f);
 			fclose(f);
 		}
 		else
 		{
-			for (i = 0; i < (u16) (MEMORY_SIZE / 2); i++)
+			for (i = 0; i < (u16) (MEMORY_SIZE >> 1); i++)
 				m->ram[i] = (u8) 0;
 		}
 	}
 	else
 	{
 		// Otherwise, we just reset the whole program part
-		for (i = 0; i < (u16) (MEMORY_SIZE / 2); i++)
+		for (i = 0; i < (u16) (MEMORY_SIZE >> 1); i++)
 			m->ram[i] = (u8) 0;
 	}
 
 	// Copying the filename
 	if (filename != NULL)
 	{
-		m->filename = (char*) malloc(sizeof(filename) * sizeof(char));
+		m->filename = (char*) malloc((strlen(filename) + 1) * sizeof(char));
 		if (m->filename == NULL)
 		{
 			free(m);
@@ -81,6 +81,9 @@ void memory_free(memory_t *m)
 {
 	FILE *f = NULL;
 
+	if (m == NULL)
+		return;
+
 	// Trying to open the file of save
 	if (m->filename != NULL)
 	{
@@ -88,18 +91,21 @@ void memory_free(memory_t *m)
 		if (f != NULL)
 		{
 			// Writing the content of the memory on the file
-			fwrite((void*) m->ram, sizeof(u8), MEMORY_SIZE / 2, f);
+			fwrite((void*) m->ram, sizeof(u8), MEMORY_SIZE >> 1, f);
 			fclose(f);
 		}
 	}
 
 	// FREE THEM ALL !!!!
-	//free(m->filename);
+	free(m->filename);
 	free(m);
 }
 
 u8 *memory_setMarPos(memory_t *m, u16 address)
 {
+	if (m == NULL)
+		return NULL;
+
 	// If the positionning address is greater or equal to MEMORY_SIZE / 2, then we set position else, we do nothing
 	m->mar = (address <= MEMORY_SIZE >> 1) ? (u8*) m->ram + address : m->mar;
 
@@ -108,6 +114,9 @@ u8 *memory_setMarPos(memory_t *m, u16 address)
 
 u8 *memory_setMbrPos(memory_t *m, u16 address)
 {
+	if (m == NULL)
+		return NULL;
+
 	// If the positionning address is lesser than MEMORY_SIZE / 2, then we set position else, we do nothing
 	m->mbr = (address < MEMORY_SIZE >> 1) ? (u8*) (m->ram + MEMORY_SIZE - address - 1) : m->mbr;
 

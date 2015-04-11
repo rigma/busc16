@@ -1,17 +1,17 @@
 /**
-* BUSC16 - An emulator of a theorical processor for lessons
-* Copyright (C) 2015 Romain Failla
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * BUSC16 - An emulator of a theorical processor for lessons
+ * Copyright (C) 2015 Romain Failla
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -44,34 +44,42 @@ void ir_free(ir_t *ir)
 
 u8 ir_loadInstruction(ir_t *ir, u16 pc, memory_t *m)
 {
-	u8 *mar = NULL;
-
 	if (ir == NULL || m == NULL)
 		return FALSE;
 
 	// Moving MAR position
-	mar = m->mar;
 	if (!memory_setMarPos(m, pc))
 		return FALSE;
 
 	// Copying the new instruction
-	memcpy(ir, m->mar, sizeof(*ir));
+	memcpy(&ir->opcode, m->mar, sizeof(u8));
+
+	ir->operand = *(m->mar + 1) + *(m->mar + 2);
 
 	return TRUE;
 }
 
 u8 ir_immediateAddressing(ir_t *ir)
 {
+	if (ir == NULL)
+		return FALSE;
+
 	return (ir->opcode & 0x10) ? TRUE : FALSE;
 }
 
 u8 ir_getOpcode(ir_t *ir)
 {
+	if (ir == NULL)
+		return FALSE;
+
 	// Returns the 4 low weight bits
 	return (u8) (ir->opcode & 0x0f);
 }
 
 u16 ir_getOperand(ir_t *ir)
 {
+	if (ir == NULL)
+		return FALSE;
+
 	return ir->operand;
 }

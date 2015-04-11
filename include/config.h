@@ -16,6 +16,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 1
+
 #define MEMORY_SIZE 0x100 // the size of memory (may changes)
 
 #define TRUE  (u8) 0x1    // the value of truth

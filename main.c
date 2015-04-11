@@ -20,54 +20,14 @@
 
 int main(int argc, char **argv)
 {
-	// Some bullshit tests :P
-	/*ir_t *ir = ir_init();
-	memory_t *m = memory_init(NULL);
-	ccr_t ccr = ccr_init();
-	u8 d0 = 15;
-	u16 pc = 0;
+	cu_t *cu = NULL;
+	
+	printf("Welcome to the BUSC16 emulator v0.1 !\n");
+	printf("Loading Central Unit...\n");
 
-	printf("Initial value d0 = %u\n", d0);
-	printf("Z = %u | N = %u | C = %u | V = %u\n\n", ccr_Z(&ccr), ccr_N(&ccr), ccr_C(&ccr), ccr_V(&ccr));
+	cu = cu_init("test.ram");
 
-	ccr_reset(&ccr);
-	ir->opcode = 0x18;
-	ir->operand = 0x0003;
-
-	opcodes[ir_getOpcode(ir)](&d0, &pc, ir, &ccr, m);
-
-	printf("d0 = %u\n", d0);
-	printf("Z = %u | N = %u | C = %u | V = %u\n\n", ccr_Z(&ccr), ccr_N(&ccr), ccr_C(&ccr), ccr_V(&ccr));
-
-	ccr_reset(&ccr);
-	ir->opcode = 0x19;
-	ir->operand = 0x001b;
-
-	opcodes[ir_getOpcode(ir)](&d0, &pc, ir, &ccr, m);
-
-	printf("d0 = %u\n", d0);
-	printf("Z = %u | N = %u | C = %u | V = %u\n\n", ccr_Z(&ccr), ccr_N(&ccr), ccr_C(&ccr), ccr_V(&ccr));
-
-	ccr_reset(&ccr);
-	ir->opcode = 0x18;
-	ir->operand = 0x001b;
-
-	opcodes[ir_getOpcode(ir)](&d0, &pc, ir, &ccr, m);
-
-	ir->opcode = 0x1a;
-	ir->operand = 0x001b;
-
-	opcodes[ir_getOpcode(ir)](&d0, &pc, ir, &ccr, m);
-
-	printf("d0 = %u\n", d0);
-	printf("Z = %u | N = %u | C = %u | V = %u\n\n", ccr_Z(&ccr), ccr_N(&ccr), ccr_C(&ccr), ccr_V(&ccr));
-
-	system("pause");
-
-	memory_free(m);
-	ir_free(ir);*/
-
-	cu_t *cu = cu_init("test.ram");
+	printf("Launching...\n");
 
 	if (cu == NULL)
 		exit(EXIT_FAILURE);
