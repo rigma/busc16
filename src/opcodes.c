@@ -18,7 +18,7 @@
 
 static u8 stop(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
-	*pc = MEMORY_SIZE;
+	*pc = (u16) (MEMORY_SIZE >> 1);
 
 	return TRUE;
 }
@@ -60,14 +60,11 @@ static u8 bra(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 
 static u8 lda(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
-	u8 *mbr = (void*) 0x0;
-
 	if (ir_immediateAddressing(ir))
 		*d0 = (u8) ir_getOperand(ir);
 	else
 	{
-		mbr = m->mbr;
-		if (mbr == memory_setMbrPos(m, ir_getOperand(ir)))
+		if (!memory_setMbrPos(m, ir_getOperand(ir)))
 			return FALSE;
 
 		*d0 = *m->mbr;

@@ -19,7 +19,7 @@
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 1
 
-#define MEMORY_SIZE 0x100 // the size of memory (may changes)
+#define MEMORY_SIZE 0x10000 // the size of memory (may changes)
 
 #define TRUE  (u8) 0x1    // the value of truth
 #define FALSE (u8) 0x0    // the value of lie

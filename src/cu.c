@@ -55,7 +55,7 @@ u8 cu_run(cu_t *cu)
 
 	while (cu->pc < MEMORY_SIZE && !stop)
 	{
-		if (cu->pc == MEMORY_SIZE)
+		if (cu->pc == MEMORY_SIZE >> 1)
 		{
 			stop = TRUE;
 

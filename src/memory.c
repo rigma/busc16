@@ -23,7 +23,7 @@ memory_t *memory_init(const char *filename)
 {
 	FILE *f = NULL;
 	memory_t *m = NULL;
-	short i = 0;
+	u32 i = 0;
 	
 	// Trying to allocating the memory
 	m = (memory_t*) malloc(sizeof(memory_t));
@@ -107,7 +107,7 @@ u8 *memory_setMarPos(memory_t *m, u16 address)
 		return NULL;
 
 	// If the positionning address is greater or equal to MEMORY_SIZE / 2, then we set position else, we do nothing
-	m->mar = (address <= MEMORY_SIZE >> 1) ? (u8*) m->ram + address : m->mar;
+	m->mar = (address <= MEMORY_SIZE >> 1) ? (u8*) m->ram + address : NULL;
 
 	return m->mar;
 }
@@ -118,7 +118,7 @@ u8 *memory_setMbrPos(memory_t *m, u16 address)
 		return NULL;
 
 	// If the positionning address is lesser than MEMORY_SIZE / 2, then we set position else, we do nothing
-	m->mbr = (address < MEMORY_SIZE >> 1) ? (u8*) (m->ram + MEMORY_SIZE - address - 1) : m->mbr;
+	m->mbr = (address < MEMORY_SIZE >> 1) ? (u8*) (m->ram + MEMORY_SIZE - address - 1) : NULL;
 
 	return m->mbr;
 }

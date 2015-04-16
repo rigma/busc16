@@ -22,10 +22,10 @@ int main(int argc, char **argv)
 {
 	cu_t *cu = NULL;
 	
-	printf("Welcome to the BUSC16 emulator v0.1 !\n");
+	printf("Welcome to the BUSC16 emulator v%d.%d !\n", VERSION_MAJOR, VERSION_MINOR);
 	printf("Loading Central Unit...\n");
 
-	cu = cu_init("test.ram");
+	cu = cu_init("prime.ram");
 
 	printf("Launching...\n");
 
@@ -33,6 +33,9 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 
 	cu_run(cu);
+
+	printf("End of program.\n");
+
 	cu_free(cu);
 
 	system("pause");
