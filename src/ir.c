@@ -47,14 +47,21 @@ u8 ir_loadInstruction(ir_t *ir, u16 pc, memory_t *m)
 	if (ir == NULL || m == NULL)
 		return FALSE;
 
-	// Moving MAR position
-	if (!memory_setMarPos(m, pc))
-		return FALSE;
+	memory_setWordMode(m, BYTE);
 
-	// Copying the new instruction
-	memcpy(&ir->opcode, m->mar, sizeof(u8));
+	// Loading the opcode in the register
+	memory_MAR_read(m, pc);
 
-	ir->operand = *(m->mar + 1) + *(m->mar + 2);
+	ir->opcode = (u8) m->mar & 0x000000ff;
+
+	// Loading the operand in the register
+	memory_MAR_read(m, ++pc);
+
+	ir->operand = (u16) ((m->mar << 8) & 0x0000ff00);
+
+	memory_MAR_read(m, ++pc);
+
+	ir->operand |= (u16) (m->mar & 0x000000ff);
 
 	return TRUE;
 }

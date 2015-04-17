@@ -16,7 +16,12 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
+#include "chip.h"
 #include "config.h"
+
+#define BYTE      0x0
+#define HALF_WORD 0x1
+#define WORD      0x2
 
 /**
  * @struct memory_t
@@ -26,11 +31,12 @@
  *		   For now, the first half of the memory is reserved for the Assembler code and the second half is reserved for local variables.
  */
 typedef struct {
-	u8 ram[MEMORY_SIZE];
-	u8 *mbr;
-	u8 *mar;
+	chip_t chips[4];
+	u32 mbr;
+	u32 mar;
 	char *filename;
-} memory_t; // TODO : adding a ROM system for storing the program, I think it'll be better.
+	u8 wordMode;
+} memory_t;
 
 /**
  * @fn     memory_init(const char *filename)
@@ -50,23 +56,75 @@ memory_t *memory_init(const char *filename);
 void memory_free(memory_t *m);
 
 /**
-* @fn     memory_setMarPos(memory_t *m, u16 address)
-* @author Romain Failla
-* @brief  Set the position of the MAR on the SRAM
-* @param  memory_t *m : the reference of the memory
-* @param  u16 address : the positionning address
-* @return u8* : the new position of MAR register
-*/
-u8 *memory_setMarPos(memory_t *m, u16 address);
+ * @fn     memory_setWordMode(memory_t *m, u8 wordMode)
+ * @author Romain Failla
+ * @brief  Set the word mode of the memory
+ * @param  memory_t *m : the reference to the memory
+ * @param  u8 wordMode : the new word mode
+ */
+void memory_setWordMode(memory_t *m, u8 wordMode);
 
 /**
- * @fn     memory_setMbrPos(memory_t *m, u16 address)
+ * @fn     memory_write(memory_t *m, u16 address, u32 *content)
  * @author Romain Failla
- * @brief  Set the position of the MBR on the SRAM
- * @param  memory_t *m : the reference of the memory
- * @param  u16 address : the positionning address
- * @return u8* : the new position of MBR register
+ * @brief  Write a content of a given address
+ * @param  memory_t *m : the reference to the memory
+ * @param  u16 address : the address where write
+ * @param  u32 *content : the reference to the content to write
+ * @return u8 : true if success, false else
  */
-u8 *memory_setMbrPos(memory_t *m, u16 address);
+u8 memory_write(memory_t *m, u16 address, u32 *content);
+
+/**
+ * @fn     memory_read(memory_t *m, u16 address)
+ * @author Romain Failla
+ * @brief  Read the content of a given address
+ * @param  memory_t *m : the reference to the memory
+ * @param  u16 address : the address to read
+ * @return u32 : the content of the word
+ */
+u32 memory_read(memory_t *m, u16 address);
+
+/**
+ * @fn     memory_MAR_read(memory_t *m, u16 address)
+ * @author Romain Failla
+ * @brief  Put the content of a given address in MAR register
+ * @param  memory_t *m : the reference to the memory
+ * @param  u16 address : the address to read
+ * @return u8 : true if success, false else
+ */
+u8 memory_MAR_read(memory_t *m, u16 address);
+
+/**
+ * @fn     memory_MAR_write(memory_t *m, u16 address)
+ * @author Romain Failla
+ * @brief  Put the content of MAR register to the given address
+ * @param  memory_t *m : the reference to the memory
+ * @param  u16 address : the address where write
+ * @return u8 : true if success, false else
+ */
+u8 memory_MAR_write(memory_t *m, u16 address);
+
+/**
+ * @fn     memory_MBR_read(memory_t *m, u16 address)
+ * @author Romain Failla
+ * @brief  Put the content of a given address in MBR register
+ * @param  memory_t *m : the reference to the memory
+ * @param  u16 address : the address to read
+ * @return u8 : true if success, false else
+ */
+u8 memory_MBR_read(memory_t *m, u16 address);
+
+/**
+ * @fn     memory_MBR_write(memory_t *m, u16 address)
+ * @author Romain Failla
+ * @brief  Put the content of MBR register to the given address
+ * @param  memory_t *m : the reference to the memory
+ * @param  u16 address : the address where write
+ * @return u8 : true if success, false else
+ */
+u8 memory_MBR_write(memory_t *m, u16 address);
+
+void memory_write_prime(memory_t *m);
 
 #endif

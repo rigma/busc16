@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
     <ClCompile Include="src\ccr.c" />
+    <ClCompile Include="src\chip.c" />
     <ClCompile Include="src\cu.c" />
     <ClCompile Include="src\ir.c" />
     <ClCompile Include="src\memory.c" />
@@ -88,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ccr.h" />
+    <ClInclude Include="include\chip.h" />
     <ClInclude Include="include\config.h" />
     <ClInclude Include="include\ir.h" />
     <ClInclude Include="include\memory.h" />

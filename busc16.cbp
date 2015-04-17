@@ -24,6 +24,7 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="include/ccr.h" />
+		<Unit filename="include/chip.h" />
 		<Unit filename="include/config.h" />
 		<Unit filename="include/cu.h" />
 		<Unit filename="include/ir.h" />
@@ -33,6 +34,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/ccr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/chip.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/cu.c">

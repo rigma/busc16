@@ -13,14 +13,43 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef OPCODE_H
-#define OPCODE_H
+#include <stdlib.h>
+#include <string.h>
 
-#include "ccr.h"
-#include "config.h"
-#include "ir.h"
-#include "memory.h"
+#include <chip.h>
 
-extern u8 (* const opcodes[]) (u32*, u16*, ir_t*, ccr_t*, memory_t*);
+chip_t chip_init(u8 reset, FILE *f)
+{
+	chip_t chip = NULL;
+	size_t i = 0;
 
-#endif
+	chip = (chip_t) malloc(CHIP_SIZE * sizeof(u8));
+	if (chip == NULL)
+		return NULL;
+
+	if (f != NULL)
+		fread((void*) chip, sizeof(u8), (size_t) CHIP_SIZE, f);
+	else if (reset)
+	{
+		for (i = 0 ; i < CHIP_SIZE ; i++)
+			chip[i] = (u8) 0x0;
+	}
+
+	return chip;
+}
+
+void chip_free(chip_t chip)
+{
+	if (chip == NULL)
+		return;
+
+	free(chip);
+}
+
+u8 chip_save(chip_t chip, FILE *f)
+{
+	if (chip == NULL || f == NULL)
+		return FALSE;
+
+	return (fwrite((void*) chip, sizeof(u8), (size_t) CHIP_SIZE, f) == 0) ? FALSE : TRUE;
+}

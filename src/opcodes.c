@@ -16,58 +16,59 @@
 #include <stdio.h>
 #include <opcodes.h>
 
-static u8 stop(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 stop(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
 	*pc = (u16) (MEMORY_SIZE >> 1);
 
 	return TRUE;
 }
 
-static u8 brz(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 brz(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
 	*pc = ccr_Z(ccr) ? ir_getOperand(ir) * 3 : *pc + 3;
 
 	return TRUE;
 }
 
-static u8 brn(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 brn(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
 	*pc = ccr_N(ccr) ? ir_getOperand(ir) * 3 : *pc + 3;
 
 	return TRUE;
 }
 
-static u8 brc(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 brc(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
 	*pc = ccr_C(ccr) ? ir_getOperand(ir) * 3 : *pc + 3;
 
 	return TRUE;
 }
 
-static u8 brv(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 brv(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
 	*pc = ccr_V(ccr) ? ir_getOperand(ir) * 3 : *pc + 3;
 
 	return TRUE;
 }
 
-static u8 bra(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 bra(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
 	*pc = ir_getOperand(ir) * 3;
 
 	return TRUE;
 }
 
-static u8 lda(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 lda(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
 	if (ir_immediateAddressing(ir))
-		*d0 = (u8) ir_getOperand(ir);
+		*d0 = (u32) ir_getOperand(ir);
 	else
 	{
-		if (!memory_setMbrPos(m, ir_getOperand(ir)))
+		memory_setWordMode(m, WORD);
+		if (!memory_MBR_read(m, ir_getOperand(ir)))
 			return FALSE;
 
-		*d0 = *m->mbr;
+		*d0 = m->mbr;
 	}
 
 	*pc += 3;
@@ -75,35 +76,38 @@ static u8 lda(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	return TRUE;
 }
 
-static u8 sta(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 sta(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
-	if (!memory_setMbrPos(m, ir_getOperand(ir)))
+	memory_setWordMode(m, WORD);
+
+	m->mbr = (u32) *d0;
+	if (!memory_MBR_write(m, ir_getOperand(ir)))
 		return FALSE;
 
-	*m->mbr = *d0;
 	*pc += 3;
 
 	return TRUE;
 }
 
-static u8 add(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 add(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
 	u16 tmp = 0;
-	u8 input = 0;
+	u32 input = 0;
 
 	if (ir_immediateAddressing(ir))
-		input = (u8) ir_getOperand(ir);
+		input = (u32) ir_getOperand(ir);
 	else
 	{
-		if (!memory_setMbrPos(m, ir_getOperand(ir)))
+		memory_setWordMode(m, WORD);
+		if (!memory_MBR_read(m, ir_getOperand(ir)))
 			return FALSE;
 
-		input = *m->mbr;
+		input = m->mbr;
 	}
 
 	tmp = *d0 + input;
 
-	*d0 = (u8) (tmp & 0xff);
+	*d0 = (u32) (tmp & 0xffffffff);
 
 	ccr_reset(ccr);
 
@@ -115,24 +119,25 @@ static u8 add(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	return TRUE;
 }
 
-static u8 sub(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 sub(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
-	short tmp = 0;
-	u8 input = 0;
+	long tmp = 0;
+	u32 input = 0;
 
 	if (ir_immediateAddressing(ir))
-		input = (u8) ir_getOperand(ir);
+		input = (u32) ir_getOperand(ir);
 	else
 	{
-		if (!memory_setMbrPos(m, ir_getOperand(ir)))
+		memory_setWordMode(m, WORD);
+		if (!memory_MBR_read(m, ir_getOperand(ir)))
 			return FALSE;
 
-		input = *m->mbr;
+		input = m->mbr;
 	}
 
-	tmp = (short) *d0 - (short) input;
+	tmp = (long) *d0 - (long) input;
 
-	*d0 = (u8) (tmp & 0xff);
+	*d0 = (u32) (tmp & 0xffffffff);
 
 	ccr_reset(ccr);
 
@@ -146,24 +151,25 @@ static u8 sub(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	return TRUE;
 }
 
-static u8 mul(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 mul(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
-	u16 tmp = 0;
-	u8 input = 0;
+	u64 tmp = 0;
+	u32 input = 0;
 
 	if (ir_immediateAddressing(ir))
-		input = (u8) ir_getOperand(ir);
+		input = (u32) ir_getOperand(ir);
 	else
 	{
-		if (!memory_setMbrPos(m, ir_getOperand(ir)))
+		memory_setWordMode(m, WORD);
+		if (!memory_MBR_read(m, ir_getOperand(ir)))
 			return FALSE;
 
-		input = *m->mbr;
+		input = m->mbr;
 	}
 
 	tmp = *d0 * input;
 
-	*d0 = (u8) (tmp & 0xff);
+	*d0 = (u32) (tmp & 0xffffffff);
 
 	ccr_reset(ccr);
 
@@ -175,24 +181,25 @@ static u8 mul(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	return TRUE;
 }
 
-static u8 div(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 div(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
 	u16 tmp = 0;
-	u8 input = 0;
+	u32 input = 0;
 
 	if (ir_immediateAddressing(ir))
-		input = (u8) ir_getOperand(ir);
+		input = (u32) ir_getOperand(ir);
 	else
 	{
-		if (!memory_setMbrPos(m, ir_getOperand(ir)))
+		memory_setWordMode(m, WORD);
+		if (!memory_MBR_read(m, ir_getOperand(ir)))
 			return FALSE;
 
-		input = *m->mbr;
+		input = m->mbr;
 	}
 
 	tmp = *d0 / input;
 
-	*d0 = (u8) (tmp & 0xff);
+	*d0 = (u32) (tmp & 0xffffffff);
 	
 	ccr_reset(ccr);
 
@@ -204,22 +211,23 @@ static u8 div(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	return TRUE;
 }
 
-static u8 cmp(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 cmp(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
-	short tmp = 0;
-	u8 input = 0;
+	long tmp = 0;
+	u32 input = 0;
 
 	if (ir_immediateAddressing(ir))
-		input = (u8) ir_getOperand(ir);
+		input = (u32) ir_getOperand(ir);
 	else
 	{
-		if (!memory_setMbrPos(m, ir_getOperand(ir)))
+		memory_setWordMode(m, WORD);
+		if (!memory_MBR_read(m, ir_getOperand(ir)))
 			return FALSE;
 
-		input = *m->mbr;
+		input = m->mbr;
 	}
 
-	tmp = (short) *d0 - (short) input;
+	tmp = (long) *d0 - (long) input;
 
 	ccr_reset(ccr);
 
@@ -233,16 +241,17 @@ static u8 cmp(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	return TRUE;
 }
 
-static u8 dsp(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
+static u8 dsp(u32 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 {
 	if (ir_immediateAddressing(ir))
 		printf("%u\n", ir_getOperand(ir));
 	else
 	{
-		if (!memory_setMbrPos(m, ir_getOperand(ir)))
+		memory_setWordMode(m, WORD);
+		if (!memory_MBR_read(m, ir_getOperand(ir)))
 			return FALSE;
 
-		printf("%u\n", *m->mbr);
+		printf("%u\n", m->mbr);
 	}
 
 	*pc += 3;
@@ -250,7 +259,7 @@ static u8 dsp(u8 *d0, u16 *pc, ir_t *ir, ccr_t *ccr, memory_t *m)
 	return TRUE;
 }
 
-u8 (*const opcodes[])(u8*, u16*, ir_t*, ccr_t*, memory_t*) = {
+u8 (*const opcodes[])(u32*, u16*, ir_t*, ccr_t*, memory_t*) = {
 	stop, brz, brn, brc, brv, bra, lda, sta,
 	add, sub, mul, div, cmp, dsp, (void*) 0x0, (void*) 0x0
 };

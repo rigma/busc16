@@ -26,6 +26,7 @@ int main(int argc, char **argv)
 	printf("Loading Central Unit...\n");
 
 	cu = cu_init("prime.ram");
+	memory_write_prime(cu->ram);
 
 	printf("Launching...\n");
 

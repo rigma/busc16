@@ -29,8 +29,8 @@ cu_t *cu_init(const char *filename)
 	cu->ram = memory_init(filename);
 	cu->ir = ir_init();
 	cu->ccr = ccr_init();
-	cu->d0 = 0;
-	cu->pc = 0;
+	cu->d0 = (u32) 0;
+	cu->pc = (u16) 0;
 
 	return cu;
 }

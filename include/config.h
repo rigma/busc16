@@ -17,9 +17,10 @@
 #define CONFIG_H
 
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 1
+#define VERSION_MINOR 2
 
-#define MEMORY_SIZE 0x10000 // the size of memory (may changes)
+#define MEMORY_SIZE (size_t) 0x10000
+#define CHIP_SIZE   (size_t) 0x4000 // the size of a chip
 
 #define TRUE  (u8) 0x1    // the value of truth
 #define FALSE (u8) 0x0    // the value of lie

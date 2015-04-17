@@ -23,9 +23,9 @@ memory_t *memory_init(const char *filename)
 {
 	FILE *f = NULL;
 	memory_t *m = NULL;
-	u32 i = 0;
+	u8 i = 0;
 	
-	// Trying to allocating the memory
+	// Trying to allocate the memory
 	m = (memory_t*) malloc(sizeof(memory_t));
 	if (m == NULL)
 		return NULL;
@@ -37,42 +37,35 @@ memory_t *memory_init(const char *filename)
 		f = fopen(filename, "rb");
 		if (f != NULL)
 		{
-			// Reading the file content
-			fread((void*) m->ram, sizeof(u8), MEMORY_SIZE >> 1, f);
+			for (i = 0 ; i < 4 ; i++)
+				m->chips[i] = chip_init(0, f);
+
 			fclose(f);
 		}
 		else
 		{
-			for (i = 0; i < (u16) (MEMORY_SIZE >> 1); i++)
-				m->ram[i] = (u8) 0;
+			for (i = 0 ; i < 4 ; i++)
+				m->chips[i] = chip_init(0, NULL);
 		}
+
+		m->filename = (char*) malloc((strlen(filename) + 1) * sizeof(char));
+		if (m->filename != NULL)
+			strcpy(m->filename, filename);
 	}
 	else
 	{
 		// Otherwise, we just reset the whole program part
-		for (i = 0; i < (u16) (MEMORY_SIZE >> 1); i++)
-			m->ram[i] = (u8) 0;
-	}
+		for (i = 0; i < 4; i++)
+			m->chips[i] = chip_init(0, NULL);
 
-	// Copying the filename
-	if (filename != NULL)
-	{
-		m->filename = (char*) malloc((strlen(filename) + 1) * sizeof(char));
-		if (m->filename == NULL)
-		{
-			free(m);
-
-			return NULL;
-		}
-
-		strcpy(m->filename, filename);
-	}
-	else
 		m->filename = NULL;
+	}
 
 	// Setting MAR and MBR to the 0 position
-	m->mar = (u8*) m->ram;
-	m->mbr = (u8*) (m->ram + MEMORY_SIZE - 1);
+	memory_setWordMode(m, WORD);
+
+	m->mar = memory_read(m, (u16) 0);
+	m->mbr = memory_read(m, (u16) (MEMORY_SIZE - 1));
 
 	return m;
 }
@@ -80,6 +73,7 @@ memory_t *memory_init(const char *filename)
 void memory_free(memory_t *m)
 {
 	FILE *f = NULL;
+	u8 i = 0;
 
 	if (m == NULL)
 		return;
@@ -91,7 +85,9 @@ void memory_free(memory_t *m)
 		if (f != NULL)
 		{
 			// Writing the content of the memory on the file
-			fwrite((void*) m->ram, sizeof(u8), MEMORY_SIZE >> 1, f);
+			for (i = 0; i < 4; i++)
+				chip_save(m->chips[i], f);
+
 			fclose(f);
 		}
 	}
@@ -101,24 +97,128 @@ void memory_free(memory_t *m)
 	free(m);
 }
 
-u8 *memory_setMarPos(memory_t *m, u16 address)
+void memory_setWordMode(memory_t *m, u8 wordMode)
 {
-	if (m == NULL)
-		return NULL;
-
-	// If the positionning address is greater or equal to MEMORY_SIZE / 2, then we set position else, we do nothing
-	m->mar = (address <= MEMORY_SIZE >> 1) ? (u8*) m->ram + address : NULL;
-
-	return m->mar;
+	m->wordMode = wordMode & 0x3;
 }
 
-u8 *memory_setMbrPos(memory_t *m, u16 address)
+u8 memory_write(memory_t *m, u16 address, u32 *content)
+{
+	u8 chipSelect = 0;
+
+	if (m == NULL || content == NULL)
+		return FALSE;
+
+	chipSelect = address & 0x3;
+
+	if (m->wordMode & 0x2)
+	{
+		m->chips[3][address >> 2] = (u8) ((*content & 0xff000000) >> 24);
+		m->chips[2][address >> 2] = (u8) ((*content & 0x00ff0000) >> 16);
+		m->chips[1][address >> 2] = (u8) ((*content & 0x0000ff00) >> 8);
+		m->chips[0][address >> 2] = (u8) (*content & 0x000000ff);
+	}
+	else if ((m->wordMode & 0x1) && !(chipSelect & 0x2))
+	{
+		m->chips[1][address >> 2] = (u8) ((*content & 0x0000ff00) >> 8);
+		m->chips[0][address >> 2] = (u8) (*content & 0x000000ff);
+	}
+	else if ((m->wordMode & 0x1) && !(chipSelect & 0x2))
+	{
+		m->chips[3][address >> 2] = (u8) ((*content & 0xff000000) >> 24);
+		m->chips[2][address >> 2] = (u8) ((*content & 0x00ff0000) >> 16);
+	}
+	else if (!(chipSelect & 0x2) && !(chipSelect & 0x1))
+		m->chips[0][address >> 2] = (u8) (*content & 0x000000ff);
+	else if (!(chipSelect & 0x2) && (chipSelect & 0x1))
+		m->chips[1][address >> 2] = (u8) (*content & 0x000000ff);
+	else if ((chipSelect & 0x2) && !(chipSelect & 0x1))
+		m->chips[2][address >> 2] = (u8) (*content & 0x000000ff);
+	else if ((chipSelect & 0x2) && (chipSelect & 0x1))
+		m->chips[3][address >> 2] = (u8) (*content & 0x000000ff);
+
+	return TRUE;
+}
+
+u32 memory_read(memory_t *m, u16 address)
+{
+	u8 chipSelect = address & 0x3;
+
+	if (m == NULL)
+		return 0;
+
+	if (m->wordMode & 0x2)
+		return (((u32) m->chips[3][address >> 2]) << 24) + (((u32) m->chips[2][address >> 2]) << 16) + (((u32) m->chips[1][address >> 2]) << 8) + (u32) (m->chips[0][address >> 2]);
+	else if ((m->wordMode & 0x1) && !(chipSelect & 0x2))
+		return (((u32) m->chips[1][address >> 2]) << 8) + ((u32) m->chips[0][address >> 2]);
+	else if ((m->wordMode & 0x1) && !(chipSelect & 0x2))
+		return (((u32) m->chips[3][address >> 2]) << 8) + ((u32) m->chips[2][address >> 2]);
+	else if (!(chipSelect & 0x2) && !(chipSelect & 0x1))
+		return (u32) m->chips[0][address >> 2];
+	else if (!(chipSelect & 0x2) && (chipSelect & 0x1))
+		return (u32) m->chips[1][address >> 2];
+	else if ((chipSelect & 0x2) && !(chipSelect & 0x1))
+		return (u32) m->chips[2][address >> 2];
+	else if ((chipSelect & 0x2) && (chipSelect & 0x1))
+		return (u32) m->chips[3][address >> 2];
+
+	return 0;
+}
+
+u8 memory_MAR_read(memory_t *m, u16 address)
 {
 	if (m == NULL)
-		return NULL;
+		return FALSE;
 
-	// If the positionning address is lesser than MEMORY_SIZE / 2, then we set position else, we do nothing
-	m->mbr = (address < MEMORY_SIZE >> 1) ? (u8*) (m->ram + MEMORY_SIZE - address - 1) : NULL;
+	m->mar = memory_read(m, address);
 
-	return m->mbr;
+	return TRUE;
+}
+
+u8 memory_MAR_write(memory_t *m, u16 address)
+{
+	if (m == NULL)
+		return FALSE;
+
+	return memory_write(m, address, &m->mar);
+}
+
+u8 memory_MBR_read(memory_t *m, u16 address)
+{
+	if (m == NULL)
+		return FALSE;
+
+	m->mbr = memory_read(m, MEMORY_SIZE - (address * 4) - 1);
+
+	return TRUE;
+}
+
+u8 memory_MBR_write(memory_t *m, u16 address)
+{
+	if (m == NULL)
+		return FALSE;
+
+	return memory_write(m, MEMORY_SIZE - (address * 4) - 1, &m->mbr);
+}
+
+void memory_write_prime(memory_t *m)
+{
+	u8 prime[] = {
+		0x16, 0x00, 0x02, 0x07, 0x00, 0x00, 0x1c, 0x00, 0x65, 0x02, 0x00, 0x05, 0x00, 0x00, 0x00, 0x19,
+		0x00, 0x01, 0x07, 0x00, 0x02, 0x16, 0x00, 0x02, 0x07, 0x00, 0x01, 0x0c, 0x00, 0x02, 0x02, 0x00,
+		0x10, 0x0d, 0x00, 0x00, 0x06, 0x00, 0x00, 0x18, 0x00, 0x01, 0x07, 0x00, 0x00, 0x05, 0x00, 0x02,
+		0x06, 0x00, 0x00, 0x0b, 0x00, 0x01, 0x0a, 0x00, 0x01, 0x07, 0x00, 0x03, 0x06, 0x00, 0x00, 0x0c,
+		0x00, 0x03, 0x01, 0x00, 0x1b, 0x06, 0x00, 0x01, 0x18, 0x00, 0x01, 0x07, 0x00, 0x01, 0x05, 0x00,
+		0x09, 0x05, 0x00, 0x0d, 0x00
+	};
+	u8 i = 0;
+
+	memory_setWordMode(m, BYTE);
+
+	for (i = 0; i < 85; i++)
+	{
+		m->mar = (u32) prime[i];
+		
+		memory_MAR_write(m, (u16) i);
+	}
 }

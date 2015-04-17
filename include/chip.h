@@ -13,51 +13,40 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UC_H
-#define UC_H
+#ifndef CHIP_H
+#define CHIP_H
 
-#include "ccr.h"
+#include <stdio.h>
+
 #include "config.h"
-#include "ir.h"
-#include "memory.h"
+
+typedef u8* chip_t;
 
 /**
- * @struct cu_t
+ * @fn     chip_init(u8 reset, FILE *f)
  * @author Romain Failla
- * @brief  Symbolize the central unit of the BUSC16 processor
+ * @brief  Init a chip bar of the memory from a file, if it available
+ * @param  u8 reset : tells if we reset the whole new memory
+ * @param  FILE *f : the file which contains the content of the chip
+ * @return chip_t : the reference to the new chip
  */
-typedef struct {
-	ccr_t ccr;
-	ir_t *ir;
-	memory_t *ram;
-	u32 d0;
-	u16 pc;
-} cu_t;
+chip_t chip_init(u8 reset, FILE *f);
 
 /**
- * @fn     cu_init(const char *filename)
+ * @fn     chip_free(chip_t chip)
  * @author Romain Failla
- * @brief  Initialize the central unit of the BUSC16
- * @param  const char *filename : the file that contains the memory
- * @return cu_t* : the reference to the new central unit
+ * @brief  Free a chip of the memory
  */
-cu_t *cu_init(const char *filename);
+void chip_free(chip_t chip);
 
 /**
-* @fn     cu_free(cu_t *cu)
-* @author Romain Failla
-* @brief  Free a central unit of the memory
-* @param  cu_t *cu : the reference to the central unit to free
-*/
-void cu_free(cu_t *cu);
-
-/**
- * @fn     cu_run(cu_t *cu)
+ * @fn     chip_save(FILE *f)
  * @author Romain Failla
- * @brief  Run the central unit
- * @param  cu_t *cu : the central unit to run
- * @return u8 : return 0 if everything was good, 1 else
+ * @brief  Save the chip in a file
+ * @param  chip_t chip : the chip to save
+ * @param  FILE *f : the file of save
+ * @return u8 : TRUE if success, FALSE else
  */
-u8 cu_run(cu_t *cu);
+u8 chip_save(chip_t chip, FILE *f);
 
 #endif
